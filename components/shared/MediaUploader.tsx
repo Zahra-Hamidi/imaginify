@@ -10,8 +10,8 @@ import React from "react";
 type MediaUploaderProps = {
   onValueChange: (value: string) => void;
   setImage: React.Dispatch<any>;
-  publicId?: string;
-  image?: any;
+  publicId: string;
+  image: any;
   type: string;
 };
 
