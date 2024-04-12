@@ -1,6 +1,7 @@
 import { Schema, model, models } from "mongoose";
 
 export interface IImage extends Document {
+  _id: string;
   title: string;
   transformationType: string;
   publicId: string;
@@ -22,6 +23,7 @@ export interface IImage extends Document {
 }
 
 const ImageSchema = new Schema({
+  _id: Schema.Types.ObjectId,
   title: { type: String, require: true },
   transformationType: { type: String, require: true },
   publicId: { type: String, require: true },

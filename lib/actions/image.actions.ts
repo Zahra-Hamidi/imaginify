@@ -6,6 +6,8 @@ import User from "../database/user.model";
 import Image from "../database/image.model";
 import { redirect } from "next/navigation";
 
+import { v2 as cloudinary } from "cloudinary";
+
 const populateUser = (query: any) =>
   query.populate({
     path: "author",
@@ -77,6 +79,64 @@ export async function getImageById(imageId: string) {
     if (!image) throw new Error("Image not found");
 
     return JSON.parse(JSON.stringify(image));
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getAllImages({
+  limit = 9,
+  page = 1,
+  searchQuery = "",
+}: {
+  limit?: number;
+  page: number;
+  searchQuery?: string;
+}) {
+  try {
+    await connectToDatabase();
+    cloudinary.config({
+      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECTET,
+      secure: true,
+    });
+
+    let expression = "folder=imaginify";
+    if (searchQuery) {
+      expression += ` AND ${searchQuery}`;
+    }
+    const { resources } = await cloudinary.search
+      .expression(expression)
+      .execute();
+
+    const resourceIds = resources.map((resource: any) => resource.public_id);
+
+    let query = {};
+
+    if (searchQuery) {
+      query = {
+        publicId: {
+          $in: resourceIds,
+        },
+      };
+    }
+
+    const skipAmount = Number(page) * limit;
+
+    const images = await populateUser(Image.find(query))
+      .sort({ updatedAt: -1 })
+      .skip(skipAmount)
+      .limit(limit);
+
+    const totalImages = await Image.find(query).countDocuments();
+    const savedImages = Image.find().countDocuments();
+
+    return {
+      data: JSON.parse(JSON.stringify(images)),
+      totalPage: Math.ceil(totalImages / limit),
+      savedImages,
+    };
   } catch (error) {
     console.log(error);
   }
