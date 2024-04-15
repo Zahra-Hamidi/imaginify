@@ -17,7 +17,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
         <h1 className="home-heading">
           Unleash Your Creative Vision with Imaginify
         </h1>
-        <ul className="flex-center w-full gap-20">
+        {/* <ul className="flex-center w-full gap-20">
           {navLinks.slice(1, 5).map((link) => (
             <Link
               key={link.route}
@@ -35,7 +35,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
               <p className="p-14-medium text-center text-white">{link.label}</p>
             </Link>
           ))}
-        </ul>
+        </ul> */}
       </section>
 
       <section className="sm:mt-12">
